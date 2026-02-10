@@ -1,8 +1,8 @@
-import User from '../../models/user.model.js'
-import { comparePassword, hashPassword } from '../../utils/hash.util.js'
-import { generateAccessToken } from '../../utils/jwt.util.js'
+import User from '../models/user.model.js'
+import { comparePassword, hashPassword } from '../utils/hash.util.js'
+import { generateAccessToken } from '../utils/jwt.util.js'
 
-// ======* REGISTER USER *======
+// ================================*REGISTER* ================================
 const register = async (req, res) => {
   try {
     const { name, email, password } = req.body
@@ -49,7 +49,7 @@ const register = async (req, res) => {
   }
 }
 
-// ======* LOGIN USER *======
+// ================================* LOGIN USER * ================================
 const login = async (req, res) => {
   try {
     const { email, password } = req.body

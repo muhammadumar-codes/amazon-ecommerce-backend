@@ -1,7 +1,7 @@
-// ======*IMPORT FILES *======
-import express from 'express'
-const app = express()
-const PORT = 5000
+// ======*IMPORT FILE
+
+import app from './app.js'
+const PORT = process.env.PORT
 import connectDB from './config/db.js'
 
 // ======*ENV*======
@@ -12,12 +12,6 @@ dotenv.config()
 
 import dns from 'dns'
 dns.setServers(['8.8.8.8', '8.8.4.4'])
-
-app.use(express.json())
-
-app.get('/', (req, res) => {
-  res.send('wellcome the home page')
-})
 
 // ======*connect DB*======
 
