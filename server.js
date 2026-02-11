@@ -18,5 +18,5 @@ dns.setServers(['8.8.8.8', '8.8.4.4'])
 connectDB()
 
 app.listen(PORT, () => {
-  console.log('server is running ')
+  console.info(`[${new Date().toDateString()}] Server is Running `)
 })

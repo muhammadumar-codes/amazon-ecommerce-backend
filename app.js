@@ -9,7 +9,7 @@ app.use(express.json())
 app.use('/api/auth', authRoutes)
 
 app.get('/', (req, res) => {
-  res.json({ success: true, message: 'API running' })
+  res.json({ success: true, message: 'API is Running 👍' })
 })
 
 export default app
