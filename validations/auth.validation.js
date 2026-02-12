@@ -1,33 +1,53 @@
-// =====*** IMPORT YUP ***=====
 import * as yup from 'yup'
 
-// ================================* REGISTER SCHEMA *============================
-
-export const registerSchema = yup.object().shape({
-  name: yup.string().required('Name is required'),
+export const registerSchema = yup.object({
+  name: yup
+    .string()
+    .trim()
+    .min(3, 'Name must be at least 3 characters')
+    .max(50, 'Name cannot exceed 50 characters')
+    .required('Name is required'),
 
   email: yup
     .string()
+    .trim()
+    .lowercase()
     .email('Invalid email format')
     .required('Email is required'),
 
   password: yup
     .string()
+    .trim()
     .min(6, 'Password must be at least 6 characters')
+    .max(50, 'Password cannot exceed 50 characters')
+    .matches(
+      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]+$/,
+      'Password must contain at least one letter and one number'
+    )
     .required('Password is required'),
 
   confirmPassword: yup
     .string()
-    .oneOf([yup.ref('password')], 'Passwords must match')
+    .trim()
+    .oneOf([yup.ref('password'), null], 'Passwords must match')
     .required('Confirm password is required'),
 })
 
 // ================================* LOGIN SCHEMA *============================
-export const loginSchema = yup.object().shape({
+import * as yup from 'yup'
+
+export const loginSchema = yup.object({
   email: yup
     .string()
+    .trim()
+    .lowercase()
     .email('Invalid email format')
     .required('Email is required'),
 
-  password: yup.string().required('Password is required'),
+  password: yup
+    .string()
+    .trim()
+    .min(6, 'Password must be at least 6 characters')
+    .max(50, 'Password cannot exceed 50 characters')
+    .required('Password is required'),
 })
