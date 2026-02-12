@@ -1,10 +1,13 @@
+// =====*** IMPORTS ***=====
 import jwt from 'jsonwebtoken'
 
+// ============================* AUTH MIDDLEWARE *=============================
 const authMiddleware = (req, res, next) => {
   try {
-    // Get token from header
+    // =====*** Get Authorization Header ***=====
     const authHeader = req.headers.authorization
 
+    // =====*** Check if token exists & starts with Bearer ***=====
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({
         success: false,
@@ -12,17 +15,19 @@ const authMiddleware = (req, res, next) => {
       })
     }
 
-    // Extract token
+    // =====*** Extract Token ***=====
     const token = authHeader.split(' ')[1]
 
-    // Verify token
+    // =====*** Verify Token ***=====
     const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-    // Attach user to request
+    // =====*** Attach decoded user data to request ***=====
     req.user = decoded
 
     next()
   } catch (error) {
+    console.error('=====*** AUTH MIDDLEWARE ERROR ***=====', error)
+
     return res.status(401).json({
       success: false,
       message: 'Invalid or expired token',
