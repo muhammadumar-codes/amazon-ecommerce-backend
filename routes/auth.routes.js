@@ -1,7 +1,7 @@
 // =====*** IMPORTS ***=====
 import { Router } from 'express'
 import authController from '../controllers/auth.controller.js'
-import validate from '../middlewares/validate.middleware.js'
+import validate from '../middleware/validate.middleware.js'
 import { registerSchema, loginSchema } from '../validations/auth.validation.js'
 
 const router = Router()
