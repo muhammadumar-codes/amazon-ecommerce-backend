@@ -1,7 +1,8 @@
 // ======*IMPORT FILE
 
 import app from './app.js'
-const PORT = process.env.PORT
+const PORT = 5000
+
 import connectDB from './config/db.js'
 
 // ======*ENV*======
@@ -11,6 +12,7 @@ dotenv.config()
 // ======*DNS*======
 
 import dns from 'dns'
+import { log } from 'console'
 dns.setServers(['8.8.8.8', '8.8.4.4'])
 
 // ======*connect DB*======
