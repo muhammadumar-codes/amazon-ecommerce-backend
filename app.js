@@ -1,6 +1,7 @@
 // =====*** IMPORTS ***=====
 import express from 'express'
 import authRoutes from './routes/auth.routes.js'
+import productRoutes from './routes/product.routes.js'
 
 // =====*** INITIALIZE EXPRESS APP ***=====
 const app = express()
@@ -12,6 +13,9 @@ app.use(express.json())
 
 // =====*** Auth Routes ***=====
 app.use('/api/auth', authRoutes)
+
+// =====*** Product Routes ***=====
+app.use('/api/products', productRoutes)
 
 // =====*** Health Check Route ***=====
 app.get('/', (req, res) => {

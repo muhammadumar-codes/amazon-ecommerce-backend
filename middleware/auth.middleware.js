@@ -1,38 +1,27 @@
-// =====*** IMPORTS ***=====
 import jwt from 'jsonwebtoken'
+import asyncHandler from 'express-async-handler'
+import User from '../models/user.model.js'
 
-// ============================* AUTH MIDDLEWARE *=============================
-const authMiddleware = (req, res, next) => {
-  try {
-    // =====*** Get Authorization Header ***=====
-    const authHeader = req.headers.authorization
-
-    // =====*** Check if token exists & starts with Bearer ***=====
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return res.status(401).json({
-        success: false,
-        message: 'Access denied. No token provided',
-      })
-    }
-
-    // =====*** Extract Token ***=====
-    const token = authHeader.split(' ')[1]
-
-    // =====*** Verify Token ***=====
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
-
-    // =====*** Attach decoded user data to request ***=====
-    req.user = decoded
-
-    next()
-  } catch (error) {
-    console.error('=====*** AUTH MIDDLEWARE ERROR ***=====', error)
-
-    return res.status(401).json({
-      success: false,
-      message: 'Invalid or expired token',
-    })
+const authMiddleware = asyncHandler(async (req, res, next) => {
+  const token = req.headers.authorization?.split(' ')[1]
+  if (!token) {
+    res.status(401)
+    throw new Error('Not authorized, token missing')
   }
-}
+
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const user = await User.findById(decoded.id)
+    if (!user) {
+      res.status(401)
+      throw new Error('User not found')
+    }
+    req.user = user
+    next()
+  } catch (err) {
+    res.status(401)
+    throw new Error('Token is invalid')
+  }
+})
 
 export default authMiddleware
