@@ -9,11 +9,6 @@ import connectDB from './config/db.js'
 import dotenv from 'dotenv'
 dotenv.config()
 
-// ======*DNS*======
-
-import dns from 'dns'
-dns.setServers(['8.8.8.8', '8.8.4.4'])
-
 // ======*connect DB*======
 
 connectDB()
