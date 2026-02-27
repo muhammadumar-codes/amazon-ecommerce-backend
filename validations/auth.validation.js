@@ -20,10 +20,6 @@ export const registerSchema = yup.object({
     .trim()
     .min(6, 'Password must be at least 6 characters')
     .max(50, 'Password cannot exceed 50 characters')
-    .matches(
-      /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*?&]+$/,
-      'Password must contain at least one letter and one number'
-    )
     .required('Password is required'),
 
   confirmPassword: yup
