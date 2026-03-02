@@ -1,15 +1,15 @@
 // =====*** DATABASE CONNECTION ***=====
 import mongoose from 'mongoose'
 
-// =====*** Connect to MongoDB ***=====
 const connectDB = async () => {
   try {
-    await mongoose.connect(
-      'mongodb+srv://admin:admin123@cluster0.6rxrmfd.mongodb.net/?appName=Cluster0'
-    )
-    console.log('=====*** MongoDB Connected Successfully ***=====')
+    const conn = await mongoose.connect(process.env.MONGO_URI)
+
+    console.log(`=====*** MongoDB Connected: ${conn.connection.host} ***=====`)
   } catch (error) {
-    console.error('=====*** MongoDB Connection Error ***=====', error)
+    console.error(
+      `=====*** MongoDB Connection Error: ${error.message} ***=====`
+    )
     process.exit(1)
   }
 }
