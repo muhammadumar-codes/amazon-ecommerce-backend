@@ -6,34 +6,37 @@ import { generateAccessToken } from '../utils/jwt.util.js'
 
 /* ================================* REGISTER USER *============================ */
 const register = asyncHandler(async (req, res) => {
-  const { name, email, password, confirmPassword, role } = req.body
+  /* =====*** EXTRACT DATA FROM BODY ***===== */
+  const { name, email, password, role } = req.body
 
-  if (!name || !email || !password || !confirmPassword) {
+  /* =====*** VALIDATION: REQUIRED FIELDS ***===== */
+  if (!name || !email || !password) {
     res.status(400)
     throw new Error('All fields are required')
   }
 
-  if (password !== confirmPassword) {
-    res.status(400)
-    throw new Error('Passwords do not match')
-  }
 
+  /* =====*** CHECK IF USER ALREADY EXISTS ***===== */
   const existingUser = await User.findOne({ email })
   if (existingUser) {
     res.status(409)
     throw new Error('User already exists')
   }
 
+  /* =====*** HASH PASSWORD BEFORE SAVING ***===== */
   const hashedPassword = await hashPassword(password)
 
-  // ===== ROLE LOGIC =====
-  let userRole = 'USER' 
+  /* =====*** ROLE LOGIC ***=====
+     - Default role is USER
+     - Only logged-in ADMIN can assign ADMIN role
+  */
+  let userRole = 'USER'
 
-  // If someone is logged in AND is ADMIN → allow setting role
   if (req.user && req.user.role === 'ADMIN') {
     userRole = role === 'ADMIN' ? 'ADMIN' : 'USER'
   }
 
+  /* =====*** CREATE NEW USER ***===== */
   const user = await User.create({
     name,
     email,
@@ -41,6 +44,7 @@ const register = asyncHandler(async (req, res) => {
     role: userRole,
   })
 
+  /* =====*** SUCCESS RESPONSE ***===== */
   res.status(201).json({
     success: true,
     message: 'User created successfully',
@@ -55,35 +59,36 @@ const register = asyncHandler(async (req, res) => {
 
 /* ================================* LOGIN USER *=============================== */
 const login = asyncHandler(async (req, res) => {
+  /* =====*** EXTRACT DATA FROM BODY ***===== */
   const { email, password } = req.body
 
-  // =====*** Check required fields ***=====
+  /* =====*** VALIDATION: REQUIRED FIELDS ***===== */
   if (!email || !password) {
     res.status(400)
     throw new Error('Email and password are required')
   }
 
-  // =====*** Find user in DB & select password ***=====
+  /* =====*** FIND USER & INCLUDE PASSWORD FIELD ***===== */
   const user = await User.findOne({ email }).select('+password')
   if (!user) {
     res.status(401)
     throw new Error('Invalid credentials')
   }
 
-  // =====*** Compare password ***=====
+  /* =====*** COMPARE PASSWORDS ***===== */
   const isMatch = await comparePassword(password, user.password)
   if (!isMatch) {
     res.status(401)
     throw new Error('Invalid credentials')
   }
 
-  // =====*** Generate JWT token ***=====
+  /* =====*** GENERATE ACCESS TOKEN (JWT) ***===== */
   const accessToken = generateAccessToken({
     userId: user._id,
     role: user.role,
   })
 
-  // =====*** Response ***=====
+  /* =====*** SUCCESS RESPONSE ***===== */
   res.status(200).json({
     success: true,
     message: 'Login successful',
