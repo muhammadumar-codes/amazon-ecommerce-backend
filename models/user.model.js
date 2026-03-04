@@ -1,15 +1,13 @@
+/* =====*** IMPORTS ***===== */
 import mongoose from 'mongoose'
 
-// ======*USER SCHEMA*======
-
+/* ================================* USER SCHEMA *=============================== */
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
       required: true,
       trim: true,
-      minlength: 2,
-      maxlength: 50,
     },
 
     email: {
@@ -44,4 +42,5 @@ const userSchema = new mongoose.Schema(
   }
 )
 
+/* =====*** EXPORT MODEL ***===== */
 export default mongoose.model('User', userSchema)
