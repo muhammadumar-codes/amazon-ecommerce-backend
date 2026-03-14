@@ -16,6 +16,8 @@ app.use(express.json())
 app.use('/api/auth', authRoutes)
 app.use('/api/products', productRoutes)
 app.use('/api/admin', adminRoutes)
+
+
 /* =====*** HEALTH CHECK ***===== */
 app.get('/', (req, res) => {
   res.json({ success: true, message: 'API is Running 👍' })
