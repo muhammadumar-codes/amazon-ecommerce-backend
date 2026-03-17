@@ -16,31 +16,44 @@ const createProduct = asyncHandler(async (req, res) => {
 })
 
 /* ======*GET ALL PRODUCTS (SEARCH + FILTER + PAGINATION)*====== */
+
 const getProducts = asyncHandler(async (req, res) => {
   const {
     search,
     category,
     minPrice,
     maxPrice,
+    rating,
+    sort,
     page = 1,
     limit = 10,
-    sort,
   } = req.query
 
-  /* ======* BUILD QUERY OBJECT *====== */
+  /* =========================
+      BASE QUERY OBJECT
+  ========================== */
   let query = {}
 
-  //  SEARCH (by name)
+  /* =========================
+      SEARCH (MULTI-FIELD)
+  ========================== */
   if (search) {
-    query.name = { $regex: search, $options: 'i' }
+    query.$or = [
+      { name: { $regex: search.trim(), $options: 'i' } },
+      { description: { $regex: search.trim(), $options: 'i' } },
+    ]
   }
 
-  //  CATEGORY FILTER
+  /* =========================
+     CATEGORY FILTER
+  ========================== */
   if (category) {
     query.category = category
   }
 
-  //  PRICE FILTER
+  /* =========================
+      PRICE FILTER
+  ========================== */
   if (minPrice || maxPrice) {
     query.price = {}
 
@@ -48,34 +61,59 @@ const getProducts = asyncHandler(async (req, res) => {
     if (maxPrice) query.price.$lte = Number(maxPrice)
   }
 
-  /* ======* SORTING *====== */
-  let sortOption = {}
-  if (sort) {
-    // Example: price or -price
-    sortOption[sort.replace('-', '')] = sort.startsWith('-') ? -1 : 1
-  } else {
-    sortOption = { createdAt: -1 } // default latest
+  /* =========================
+      RATING FILTER
+  ========================== */
+  if (rating) {
+    query.rating = { $gte: Number(rating) }
   }
 
-  /* ======* PAGINATION *====== */
-  const pageNumber = Number(page)
-  const limitNumber = Number(limit)
+  /* =========================
+      SORTING
+  ========================== */
+  const allowedSortFields = ['price', 'createdAt', 'rating']
+
+  let sortOption = { createdAt: -1 } // default
+
+  if (sort) {
+    const field = sort.replace('-', '')
+
+    if (allowedSortFields.includes(field)) {
+      sortOption = {
+        [field]: sort.startsWith('-') ? -1 : 1,
+      }
+    }
+  }
+
+  /* =========================
+      PAGINATION
+  ========================== */
+  const pageNumber = Math.max(1, Number(page))
+  const limitNumber = Math.max(1, Number(limit))
+
   const skip = (pageNumber - 1) * limitNumber
 
-  /* ======* EXECUTE QUERY *====== */
-  const products = await Product.find(query)
+  /* =========================
+      DATABASE QUERY
+  ========================== */
+  const productsPromise = Product.find(query)
     .sort(sortOption)
     .skip(skip)
     .limit(limitNumber)
 
-  const totalProducts = await Product.countDocuments(query)
+  const countPromise = Product.countDocuments(query)
 
-  /* ======* RESPONSE *====== */
+  const [products, total] = await Promise.all([productsPromise, countPromise])
+
+  /* =========================
+     RESPONSE
+  ========================== */
   res.status(200).json({
     success: true,
-    total: totalProducts,
+    total,
     page: pageNumber,
-    pages: Math.ceil(totalProducts / limitNumber),
+    pages: Math.ceil(total / limitNumber),
+    results: products.length,
     products,
   })
 })
