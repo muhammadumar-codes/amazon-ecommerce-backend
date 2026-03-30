@@ -4,8 +4,8 @@ import dotenv from 'dotenv'
 import productRoutes from './routes/product.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import adminRoutes from './routes/admin.routes.js'
-import errorHandler from './middleware/error.middleware.js'
 import cartRoutes from './routes/cart.routes.js'
+import errorHandler from './middleware/error.middleware.js'
 
 dotenv.config()
 const app = express()
