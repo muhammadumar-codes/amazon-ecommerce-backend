@@ -1,20 +1,12 @@
-/* =====*** IMPORTS ***===== */
-import 'dotenv/config'
 import { Redis } from '@upstash/redis'
+import { env, isRedisConfigured } from './env.config.js'
 
-/* =====*** CREATE REDIS INSTANCE ***===== */
-const { UPSTASH_REDIS_REST_URL, UPSTASH_REDIS_REST_TOKEN } = process.env
-
-if (!UPSTASH_REDIS_REST_URL || !UPSTASH_REDIS_REST_TOKEN) {
-  throw new Error(
-    'Missing Redis env vars: UPSTASH_REDIS_REST_URL and/or UPSTASH_REDIS_REST_TOKEN'
-  )
-}
-
-const redis = new Redis({
-  url: UPSTASH_REDIS_REST_URL,
-  token: UPSTASH_REDIS_REST_TOKEN,
-})
+const redis = isRedisConfigured()
+  ? new Redis({
+      url: env.upstashRedisRestUrl,
+      token: env.upstashRedisRestToken,
+    })
+  : null
 
 /* =====*** EXPORT ***===== */
 export default redis

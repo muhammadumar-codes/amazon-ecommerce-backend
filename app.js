@@ -1,6 +1,6 @@
 /* =====*** IMPORTS ***===== */
 import express from 'express'
-import dotenv from 'dotenv'
+import cors from 'cors'
 import productRoutes from './routes/product.routes.js'
 import authRoutes from './routes/auth.routes.js'
 import adminRoutes from './routes/admin.routes.js'
@@ -8,11 +8,11 @@ import cartRoutes from './routes/cart.routes.js'
 import orderRoutes from './routes/order.routes.js'
 import errorHandler from './middleware/error.middleware.js'
 
-dotenv.config()
 const app = express()
 
 /* =====*** GLOBAL MIDDLEWARES ***===== */
-app.use(express.json())
+app.use(cors())
+app.use(express.json({ limit: '1mb' }))
 
 /* =====*** ROUTES ***===== */
 app.use('/api/auth', authRoutes)

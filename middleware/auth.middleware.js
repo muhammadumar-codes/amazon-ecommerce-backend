@@ -1,6 +1,7 @@
 /* =====*** IMPORTS ***===== */
 import jwt from 'jsonwebtoken'
 import asyncHandler from 'express-async-handler'
+import { env } from '../config/env.config.js'
 
 /* ================================* AUTH MIDDLEWARE *=============================== */
 
@@ -17,7 +18,7 @@ const authMiddleware = asyncHandler(async (req, res, next) => {
 
   try {
     /* =====*** VERIFY TOKEN ***===== */
-    const decoded = jwt.verify(token, process.env.JWT_SECRET)
+    const decoded = jwt.verify(token, env.jwtSecret)
 
     /* =====*** ATTACH USER DATA TO REQUEST ***===== */
     req.user = {

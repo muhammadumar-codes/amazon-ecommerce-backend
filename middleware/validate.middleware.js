@@ -2,10 +2,12 @@
 const validate = (schema) => async (req, res, next) => {
   try {
     // =====*** Validate request body against Yup schema ***=====
-    await schema.validate(req.body, {
+    const validatedBody = await schema.validate(req.body, {
       abortEarly: false,
       stripUnknown: true,
     })
+
+    req.body = validatedBody
 
     next()
   } catch (err) {
