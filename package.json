@@ -1,13 +1,13 @@
 {
   "name": "Backend",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "author": "Muhammad Umar",
   "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "start server.js"
+    "start": "node server.js"
   },
   "dependencies": {
     "@upstash/redis": "^1.37.0",

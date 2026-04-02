@@ -1,6 +1,6 @@
 /* ================================* GLOBAL ERROR HANDLER *=============================== */
 const errorHandler = (err, req, res, next) => {
-  let statusCode = res.statusCode === 200 ? 500 : res.statusCode
+  let statusCode = err.statusCode || (res.statusCode === 200 ? 500 : res.statusCode)
   let message = err.message
 
   /* =====*** MONGODB INVALID OBJECT ID ***===== */
@@ -31,6 +31,7 @@ const errorHandler = (err, req, res, next) => {
   res.status(statusCode).json({
     success: false,
     message,
+    details: err.details || null,
     stack: process.env.NODE_ENV === 'development' ? err.stack : null,
   })
 }

@@ -8,3 +8,12 @@ export const productValidationSchema = yup.object({
   stock: yup.number().min(0).default(0),
   images: yup.array().of(yup.string().url()),
 })
+
+export const updateProductValidationSchema = yup.object({
+  name: yup.string(),
+  description: yup.string(),
+  price: yup.number().positive(),
+  category: yup.string(),
+  stock: yup.number().min(0),
+  images: yup.array().of(yup.string().url()),
+})
