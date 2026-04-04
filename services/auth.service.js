@@ -3,35 +3,65 @@ import { hashPassword, comparePassword } from '../utils/hash.util.js'
 import { generateAccessToken } from '../utils/jwt.util.js'
 import { createAppError } from '../utils/app-error.util.js'
 
+const normalizeRequiredString = (value, fieldName) => {
+  if (typeof value !== 'string') {
+    throw createAppError(`${fieldName} must be a string`, 400)
+  }
+
+  const normalizedValue = value.trim()
+  if (!normalizedValue) {
+    throw createAppError(`${fieldName} is required`, 400)
+  }
+
+  return normalizedValue
+}
+
+const normalizeEmail = (email) =>
+  normalizeRequiredString(email, 'Email').toLowerCase()
+
+const normalizePassword = (password) => {
+  if (typeof password !== 'string') {
+    throw createAppError('Password must be a string', 400)
+  }
+
+  if (password.length < 6 || password.length > 50) {
+    throw createAppError('Password must be between 6 and 50 characters', 400)
+  }
+
+  return password
+}
+
 const toSafeUser = (user) => ({
-  id: user._id,
+  id: user._id.toString(),
   name: user.name,
   email: user.email,
   role: user.role,
 })
 
 const createUser = async ({ name, email, password, role }) => {
-  const normalizedEmail = email.trim().toLowerCase()
-  const normalizedName = name.trim()
-  const existingUser = await User.findOne({ email: normalizedEmail })
-  if (existingUser) {
-    throw createAppError('User already exists', 409)
+  const normalizedEmail = normalizeEmail(email)
+  const normalizedName = normalizeRequiredString(name, 'Name')
+  const normalizedPassword = normalizePassword(password)
+  const hashedPassword = await hashPassword(normalizedPassword)
+
+  try {
+    return await User.create({
+      name: normalizedName,
+      email: normalizedEmail,
+      password: hashedPassword,
+      role,
+    })
+  } catch (error) {
+    if (error?.code === 11000 && error?.keyPattern?.email) {
+      throw createAppError('User already exists', 409)
+    }
+
+    throw error
   }
-
-  const hashedPassword = await hashPassword(password)
-
-  return User.create({
-    name: normalizedName,
-    email: normalizedEmail,
-    password: hashedPassword,
-    role,
-  })
 }
 
 export const registerUser = async ({ name, email, password }) => {
-  const totalUsers = await User.countDocuments()
-  const role = totalUsers === 0 ? 'ADMIN' : 'USER'
-  const user = await createUser({ name, email, password, role })
+  const user = await createUser({ name, email, password, role: 'USER' })
 
   return {
     success: true,
@@ -51,7 +81,8 @@ export const createAdminUser = async ({ name, email, password }) => {
 }
 
 export const loginUser = async ({ email, password }) => {
-  const normalizedEmail = email.trim().toLowerCase()
+  const normalizedEmail = normalizeEmail(email)
+  const normalizedPassword = normalizePassword(password)
   const user = await User.findOne({
     email: normalizedEmail,
     isActive: true,
@@ -61,13 +92,13 @@ export const loginUser = async ({ email, password }) => {
     throw createAppError('Invalid credentials', 401)
   }
 
-  const isMatch = await comparePassword(password, user.password)
+  const isMatch = await comparePassword(normalizedPassword, user.password)
   if (!isMatch) {
     throw createAppError('Invalid credentials', 401)
   }
 
   const accessToken = generateAccessToken({
-    userId: user._id,
+    userId: user._id.toString(),
     role: user.role,
   })
 
