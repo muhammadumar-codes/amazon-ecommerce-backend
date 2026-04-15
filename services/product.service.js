@@ -14,6 +14,8 @@ export const createProduct = async ({ body, files }) => {
   const uploadedImages = files?.map((file) => file.path) || []
   const bodyImages = Array.isArray(body.images) ? body.images : []
   const images = uploadedImages.length ? uploadedImages : bodyImages
+  const normalizedRating =
+    body.ratings !== undefined ? body.ratings : body.rating
 
   console.log('=== createProduct DEBUG ===')
   console.log('files:', files)
@@ -22,10 +24,18 @@ export const createProduct = async ({ body, files }) => {
   console.log('bodyImages:', bodyImages)
   console.log('final images:', images)
 
-  const product = await Product.create({
+  const productPayload = {
     ...body,
     images,
-  })
+  }
+
+  delete productPayload.rating
+
+  if (normalizedRating !== undefined) {
+    productPayload.ratings = Number(normalizedRating)
+  }
+
+  const product = await Product.create(productPayload)
 
   console.log('created product images:', product.images)
   console.log('=== END DEBUG ===')
@@ -151,12 +161,17 @@ export const updateProduct = async ({ productId, body, files }) => {
     product.images = bodyImages
   }
 
+  if (body.ratings === undefined && body.rating !== undefined) {
+    body.ratings = body.rating
+  }
+
   const allowedUpdates = [
     'name',
     'description',
     'price',
     'category',
     'stock',
+    'ratings',
     'listPrice',
     'prime',
   ]
