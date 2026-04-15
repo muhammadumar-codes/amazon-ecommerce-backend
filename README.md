@@ -888,25 +888,6 @@ yarn test --coverage
 
 ---
 
-## 🗺️ Roadmap
-
-| Feature                          | Priority | Status     |
-| -------------------------------- | -------- | ---------- |
-| Repository layer for DB access   | High     | 📋 Planned |
-| Refresh token + token revocation | High     | 📋 Planned |
-| Integration tests with real DB   | High     | 📋 Planned |
-| Stripe webhook idempotency       | High     | ✅ Done    |
-| Structured logging (Pino)        | Medium   | 📋 Planned |
-| OpenAPI/Swagger documentation    | Medium   | 📋 Planned |
-| Audit log for admin actions      | Medium   | 📋 Planned |
-| Product reviews and ratings      | Medium   | 📋 Planned |
-| Order shipping workflow          | Low      | 📋 Planned |
-| Wishlist feature                 | Low      | 📋 Planned |
-| Email notifications              | Low      | 📋 Planned |
-| GraphQL API layer                | Low      | 📋 Planned |
-
----
-
 ## 🤝 Contributing
 
 Contributions are welcome! Here's how:
