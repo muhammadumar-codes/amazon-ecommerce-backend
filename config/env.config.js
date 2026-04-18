@@ -23,13 +23,6 @@ export const env = {
   disableRedis: process.env.DISABLE_REDIS === 'true',
 }
 
-const DEFAULT_DEV_ORIGINS = [
-  'http://localhost:5173',
-  'http://127.0.0.1:5173',
-  'http://localhost:4173',
-  'http://127.0.0.1:4173',
-]
-
 export const validateEnv = () => {
   const missing = requiredEnvKeys.filter((key) => !process.env[key])
 
@@ -73,18 +66,12 @@ export const isCloudinaryConfigured = () => {
 }
 
 export const getCorsOrigins = () => {
-  const configuredOrigins = env.corsOrigins
-    ? env.corsOrigins
-        .split(',')
-        .map((origin) => origin.trim())
-        .filter(Boolean)
-    : env.clientUrl
-      ? [env.clientUrl]
-      : []
-
-  if (env.nodeEnv === 'production') {
-    return configuredOrigins
+  if (!env.corsOrigins) {
+    return env.clientUrl ? [env.clientUrl] : []
   }
 
-  return [...new Set([...DEFAULT_DEV_ORIGINS, ...configuredOrigins])]
+  return env.corsOrigins
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter(Boolean)
 }
